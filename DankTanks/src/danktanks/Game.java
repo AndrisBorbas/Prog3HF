@@ -15,30 +15,6 @@ public class Game implements Runnable {
 		this.height = height;
 	}
 
-	private void init() {
-		display = new Display(title, width, height);
-	}
-
-	private void tick() {
-
-	}
-
-	private void render() {
-
-	}
-
-	public void run() {
-
-		init();
-
-		while (running) {
-			tick();
-			render();
-		}
-
-		stop();
-	}
-
 	public synchronized void start() {
 		if (running)
 			return;
@@ -58,6 +34,30 @@ public class Game implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	private void init() {
+		display = new Display(title, width, height);
+	}
+
+	public void run() {
+
+		init();
+
+		while (running) {
+			tick();
+			render();
+		}
+
+		stop();
+	}
+
+	private void tick() {
+
+	}
+
+	private void render() {
+
 	}
 
 }

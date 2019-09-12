@@ -8,7 +8,10 @@ import javax.swing.JFrame;
 public class Startup {
 
 	public static void main(String[] args) {
-		new Game("Dank Tanks", 400, 400);
+		
+		Game game = new Game("Dank Tanks", 400, 400);
+		
+		game.start();
 
 		/*
 		 * JFrame frame = new JFrame("Dank Tanks"); boolean running = true;
