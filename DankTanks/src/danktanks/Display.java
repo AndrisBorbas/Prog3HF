@@ -6,7 +6,7 @@ import java.awt.Dimension;
 import javax.swing.JFrame;
 
 public class Display {
-	
+
 	private JFrame frame;
 	private Canvas canvas;
 
@@ -33,5 +33,11 @@ public class Display {
 		canvas.setPreferredSize(new Dimension(width, height));
 		canvas.setMinimumSize(new Dimension(width, height));
 		canvas.setMaximumSize(new Dimension(width, height));
+		frame.add(canvas);
 	}
+
+	public Canvas getCanvas() {
+		return canvas;
+	}
+
 }
