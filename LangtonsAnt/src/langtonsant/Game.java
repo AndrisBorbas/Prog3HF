@@ -1,10 +1,6 @@
 package langtonsant;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.image.BufferStrategy;
-import java.awt.*; 
-import java.awt.image.VolatileImage;
+import langtonsant.Display;
 
 public class Game implements Runnable {
 
@@ -15,21 +11,21 @@ public class Game implements Runnable {
 	private boolean running = false;
 	private Thread thread;
 
-	private BufferStrategy bs;
-	private Graphics g;
-
+	/*
+	 * private BufferStrategy bs; private Graphics g;
+	 */
 	public Game(String title, int width, int height) {
 		this.title = title;
 		this.width = width;
 		this.height = height;
 	}
 
-	//Initialization
+	// Initialization
 	private void init() {
 		display = new Display(title, width, height);
 	}
 
-	//Threaded Start
+	// Threaded Start
 	public synchronized void start() {
 		if (running)
 			return;
@@ -38,7 +34,7 @@ public class Game implements Runnable {
 		thread.start();
 	}
 
-	//Threaded stop
+	// Threaded stop
 	public synchronized void stop() {
 		if (!running)
 			return;
@@ -52,29 +48,26 @@ public class Game implements Runnable {
 		}
 	}
 
-	//Game logic tick
+	// Game logic tick
 	private void tick() {
 
 	}
 
-	//Render tick
+	// Render tick
 	private void render() {
-		bs = display.getCanvas().getBufferStrategy();
-		if (bs == null) {
-			display.getCanvas().createBufferStrategy(2);
-			return;
-		}
-		g = bs.getDrawGraphics();
-
-		g.setColor(Color.GREEN);
-		g.fill3DRect(100, 100, 200, 200, true);
-
-		bs.show();
-		g.dispose();
-
+		/*
+		 * bs = display.getCanvas().getBufferStrategy(); if (bs == null) {
+		 * display.getCanvas().createBufferStrategy(2); return; } g =
+		 * bs.getDrawGraphics();
+		 * 
+		 * g.setColor(Color.GREEN); g.fill3DRect(100, 100, 200, 200, true);
+		 * 
+		 * bs.show(); g.dispose();
+		 */
+		display.drawboard.redraw();
 	}
 
-	//Game loop
+	// Game loop
 	public void run() {
 
 		init();
@@ -86,7 +79,9 @@ public class Game implements Runnable {
 		long lastTime = System.nanoTime();
 
 		long timer = 0;
+		@SuppressWarnings("unused")
 		int ticks = 0;
+		@SuppressWarnings("unused")
 		double frameTime = 0;
 		long frameNow = 1;
 		long frameLast = 1;
@@ -116,9 +111,9 @@ public class Game implements Runnable {
 			}
 
 			if (timer >= 1000000000) {
-				/*
-				 * System.out.println("FPS: " + ticks);
-				 */
+
+				System.out.println("FPS: " + ticks);
+
 				ticks = 0;
 				timer = 0;
 			}

@@ -1,11 +1,12 @@
 package langtonsant;
 
+import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Dimension;
-import java.awt.*; 
-import java.awt.image.VolatileImage;
 
 import javax.swing.JFrame;
+
+import langtonsant.DrawBoard;
 
 public class Display {
 
@@ -15,12 +16,16 @@ public class Display {
 	private String title;
 	private int width, height;
 
+	public DrawBoard drawboard;
+
 	public Display(String title, int width, int height) {
 		this.title = title;
 		this.width = width;
 		this.height = height;
+		drawboard = new DrawBoard(width, height);
 
 		createFrame();
+
 	}
 
 	private void createFrame() {
@@ -35,7 +40,11 @@ public class Display {
 		canvas.setPreferredSize(new Dimension(width, height));
 		canvas.setMinimumSize(new Dimension(width, height));
 		canvas.setMaximumSize(new Dimension(width, height));
-		frame.add(canvas);
+		
+		// frame.add(canvas);
+		
+		//Add the pixel drawboard
+		frame.getContentPane().add(drawboard, BorderLayout.CENTER);
 	}
 
 	public Canvas getCanvas() {

@@ -1,10 +1,5 @@
 package langtonsant;
 
-import java.awt.Canvas;
-import java.awt.Graphics;
-import javax.swing.JFrame;
-
-import langtonsant.Display;
 import langtonsant.Game;
 
 public class Main {
