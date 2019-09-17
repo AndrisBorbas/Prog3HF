@@ -1,16 +1,17 @@
-package danktanks;
+package langtonsant;
 
-import danktanks.Display;
-import danktanks.Game;
 import java.awt.Canvas;
 import java.awt.Graphics;
 import javax.swing.JFrame;
 
-public class Startup {
+import langtonsant.Display;
+import langtonsant.Game;
+
+public class Main {
 
 	public static void main(String[] args) {
 
-		Game game = new Game("Dank Tanks", 400, 400);
+		Game game = new Game("Langtons's Ant", 600, 600);
 
 		game.start();
 

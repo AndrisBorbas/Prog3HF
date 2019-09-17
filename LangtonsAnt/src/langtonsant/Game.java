@@ -1,8 +1,10 @@
-package danktanks;
+package langtonsant;
 
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
+import java.awt.*; 
+import java.awt.image.VolatileImage;
 
 public class Game implements Runnable {
 
@@ -22,10 +24,12 @@ public class Game implements Runnable {
 		this.height = height;
 	}
 
+	//Initialization
 	private void init() {
 		display = new Display(title, width, height);
 	}
 
+	//Threaded Start
 	public synchronized void start() {
 		if (running)
 			return;
@@ -34,6 +38,7 @@ public class Game implements Runnable {
 		thread.start();
 	}
 
+	//Threaded stop
 	public synchronized void stop() {
 		if (!running)
 			return;
@@ -47,10 +52,12 @@ public class Game implements Runnable {
 		}
 	}
 
+	//Game logic tick
 	private void tick() {
 
 	}
 
+	//Render tick
 	private void render() {
 		bs = display.getCanvas().getBufferStrategy();
 		if (bs == null) {
@@ -67,6 +74,7 @@ public class Game implements Runnable {
 
 	}
 
+	//Game loop
 	public void run() {
 
 		init();
