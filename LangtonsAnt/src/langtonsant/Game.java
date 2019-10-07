@@ -18,6 +18,7 @@ public class Game implements Runnable {
 	private Thread thread;
 
 	private Ant ant;
+	private Ant ant2;
 	private int scale, spacing, antmargin;
 	private String instructionset;
 	private int[] mem;
@@ -26,7 +27,7 @@ public class Game implements Runnable {
 	 * Color.gray, Color.WHITE, Color.blue, Color.RED, Color.green, Color.PINK,
 	 * Color.magenta };
 	 */
-	private final Color[] colors = { Color.getHSBColor(0f, 0.9f, 0.7f), Color.getHSBColor(0.05555f, 0.9f, 0.7f),
+	private Color[] colors = { Color.getHSBColor(0f, 0.9f, 0.7f), Color.getHSBColor(0.05555f, 0.9f, 0.7f),
 			Color.getHSBColor(0.11111f, 0.9f, 0.7f), Color.getHSBColor(0.16666f, 0.9f, 0.7f),
 			Color.getHSBColor(0.22222f, 0.9f, 0.7f), Color.getHSBColor(0.27777f, 0.9f, 0.7f),
 			Color.getHSBColor(0.33333f, 0.9f, 0.7f), Color.getHSBColor(0.38888f, 0.9f, 0.7f),
@@ -60,6 +61,8 @@ public class Game implements Runnable {
 		ant = new Ant(width / 2, height / 2, scale, spacing, antmargin, instructionset);
 		display = new Display(title, width, height, ant);
 
+		ant2 = new Ant(width / 8 * 5 - 5, height / 2, scale, spacing, antmargin, instructionset);
+
 	}
 
 	// Threaded Start
@@ -86,15 +89,17 @@ public class Game implements Runnable {
 	}
 
 	// Game logic tick
-	private void tick(long frameCount, double delta) {
-		for (int i = 0; i < 1; i++) {
+	private void tick(int stepper) {
+		for (int i = 0; i < stepper; i++) {
 			mem = ant.updateAnt(mem, width, height, colors);
 			ant.drawAnt(mem, width, height, colors);
+			mem = ant2.updateAnt(mem, width, height, colors);
+			ant2.drawAnt(mem, width, height, colors);
 		}
 	}
 
 	// Render tick
-	private void render(long frameCount, double delta) throws Exception {
+	private void render(String FPSs, String UPSs) throws Exception {
 
 		bs = display.getCanvas().getBufferStrategy();
 		if (bs == null) {
@@ -106,16 +111,13 @@ public class Game implements Runnable {
 		// g.setColor(Color.GREEN);
 		// g.fill3DRect(100, 100, 200, 200, true);
 
-		// ant.drawAnt(mem, width, height, colors);
-
 		display.processImage(g, mem);
+
+		g.drawString(FPSs, 100, 100);
+		g.drawString(UPSs, 0, 10);
 
 		bs.show();
 		g.dispose();
-
-		/*
-		 * System.out.println("Frame: " + frameCount);
-		 */
 	}
 
 	// Game loop
@@ -123,29 +125,70 @@ public class Game implements Runnable {
 
 		init();
 
-		double fps = 5;
-		double timePerTick = 1000000000.0 / fps;
-		double delta = 0;
+		// update rate limiter
+		double tickRate = 1200;
+		double timePerTick = 1000000000.0 / tickRate;
+		double tickDelta = 0;
+
+		// framerate limiter
+		double frameRate = 1000;
+		double timePerFrame = 1000000000.0 / frameRate;
+		double frameDelta = 0;
+
+		// delta timer
 		long now;
 		long lastTime = System.nanoTime();
-		long frameCount = 0;
-
-		long timer = 0;
 		@SuppressWarnings("unused")
+		long frameCount = 0L;
+
+		// framerate and update rate counters
+		long timer = 0L;
 		int ticks = 0;
+		int frames = 0;
+
+		// frametime counter
 		@SuppressWarnings("unused")
 		double frameTime = 0;
-		long frameNow = 1;
-		long frameLast = 1;
+		long frameNow = 1L;
+		long frameLast = 1L;
+
+		@SuppressWarnings("unused")
+		int exit = 0;
+
+		String FPSs = new String();
+		String UPSs = new String();
 
 		while (running) {
 
 			now = System.nanoTime();
-			delta += (now - lastTime) / timePerTick;
+			tickDelta += (now - lastTime) / timePerTick;
+			frameDelta += (now - lastTime) / timePerFrame;
 			timer += now - lastTime;
 			lastTime = now;
 
-			if (delta >= 1) {
+			/*
+			 * 
+			 * Game input
+			 * 
+			 */
+
+			if (tickDelta >= 1) {
+
+				try {
+
+					tick(1);
+
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					System.exit(701);
+				}
+
+				ticks++;
+				tickDelta--;
+			}
+
+			if (frameDelta >= 1) {
 
 				frameTime = (frameNow - frameLast) / 1000.0 / 1000.0;
 				frameLast = frameNow;
@@ -156,25 +199,28 @@ public class Game implements Runnable {
 
 				try {
 
-					tick(++frameCount, delta);
-
-					render(frameCount, delta);
+					render(FPSs,UPSs);
 
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					System.exit(701);
 				}
 
-				ticks++;
-				delta--;
+				frameCount++;
+				frames++;
+				frameDelta--;
 			}
 
 			if (timer >= 1000000000) {
 
-				System.out.println("FPS: " + ticks);
-
+				System.out.println("FPS: " + frames + ", UPS: " + ticks);
+				FPSs = String.valueOf(frames);
+				UPSs = String.valueOf(ticks);
 				ticks = 0;
+				frames = 0;
 				timer = 0;
+				// if(++exit==10) System.exit(101);
 			}
 		}
 
