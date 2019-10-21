@@ -18,7 +18,7 @@ public class Game implements Runnable {
 	private Thread thread;
 
 	private Ant ant;
-	private Ant ant2;
+	// private Ant ant2;
 	private int scale, spacing, antmargin;
 	private String instructionset;
 	private int[] mem;
@@ -61,7 +61,14 @@ public class Game implements Runnable {
 		ant = new Ant(width / 2, height / 2, scale, spacing, antmargin, instructionset);
 		display = new Display(title, width, height, ant);
 
-		ant2 = new Ant(width / 8 * 5 - 5, height / 2, scale, spacing, antmargin, instructionset);
+		// ant2 = new Ant(width / 8 * 5 - 5, height / 2, scale, spacing, antmargin,
+		// instructionset);
+
+		bs = display.getCanvas().getBufferStrategy();
+		if (bs == null) {
+			display.getCanvas().createBufferStrategy(1);
+			bs = display.getCanvas().getBufferStrategy();
+		}
 
 	}
 
@@ -93,28 +100,29 @@ public class Game implements Runnable {
 		for (int i = 0; i < stepper; i++) {
 			mem = ant.updateAnt(mem, width, height, colors);
 			ant.drawAnt(mem, width, height, colors);
-			mem = ant2.updateAnt(mem, width, height, colors);
-			ant2.drawAnt(mem, width, height, colors);
+			// mem = ant2.updateAnt(mem, width, height, colors);
+			// ant2.drawAnt(mem, width, height, colors);
 		}
 	}
 
 	// Render tick
 	private void render(String FPSs, String UPSs) throws Exception {
 
-		bs = display.getCanvas().getBufferStrategy();
-		if (bs == null) {
-			display.getCanvas().createBufferStrategy(1);
-			bs = display.getCanvas().getBufferStrategy();
-		}
+		/*
+		 * bs = display.getCanvas().getBufferStrategy(); if (bs == null) {
+		 * display.getCanvas().createBufferStrategy(1); bs =
+		 * display.getCanvas().getBufferStrategy(); } g = bs.getDrawGraphics();
+		 */
+
 		g = bs.getDrawGraphics();
 
-		// g.setColor(Color.GREEN);
+		g.setColor(Color.GREEN);
 		// g.fill3DRect(100, 100, 200, 200, true);
 
 		display.processImage(g, mem);
 
 		g.drawString(FPSs, 100, 100);
-		g.drawString(UPSs, 0, 10);
+		g.drawString(UPSs, 100, 120);
 
 		bs.show();
 		g.dispose();
@@ -131,7 +139,7 @@ public class Game implements Runnable {
 		double tickDelta = 0;
 
 		// framerate limiter
-		double frameRate = 1000;
+		double frameRate = 60;
 		double timePerFrame = 1000000000.0 / frameRate;
 		double frameDelta = 0;
 
@@ -190,7 +198,7 @@ public class Game implements Runnable {
 
 			if (frameDelta >= 1) {
 
-				frameTime = (frameNow - frameLast) / 1000.0 / 1000.0;
+				frameTime = (frameNow - frameLast) / 1000000.0;
 				frameLast = frameNow;
 				frameNow = System.nanoTime();
 				/*
@@ -199,7 +207,7 @@ public class Game implements Runnable {
 
 				try {
 
-					render(FPSs,UPSs);
+					render(FPSs, UPSs);
 
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
