@@ -1,12 +1,12 @@
 package langtonsant;
 
-import langtonsant.Game;
+import langtonsant.game.Game;
 
 public class Main {
 
 	public static void main(String[] args) {
 
-		Game game = new Game("Langtons's Ant", 1000, 1000, 3, 1, 1, "LR");
+		Game game = new Game("Langtons's Ant", 1000, 1000, 3, 1, 1, "LLRR");
 
 		game.start();
 

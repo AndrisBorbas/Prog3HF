@@ -1,4 +1,4 @@
-package langtonsant;
+package langtonsant.game;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -12,8 +12,8 @@ public class Game implements Runnable {
 	public int width, height;
 	public String title;
 
-	private BufferStrategy bs;
-	private Graphics g;
+	protected BufferStrategy bs;
+	protected Graphics g;
 	private boolean running = false;
 	private Thread thread;
 
@@ -21,7 +21,7 @@ public class Game implements Runnable {
 	// private Ant ant2;
 	private int scale, spacing, antmargin;
 	private String instructionset;
-	private int[] mem;
+	protected int[] mem;
 	/*
 	 * private final Color[] colors = { Color.DARK_GRAY, new Color(96, 57, 19),
 	 * Color.gray, Color.WHITE, Color.blue, Color.RED, Color.green, Color.PINK,
@@ -78,6 +78,7 @@ public class Game implements Runnable {
 			return;
 		running = true;
 		thread = new Thread(this);
+		thread.setName("Game");
 		thread.start();
 	}
 
@@ -117,15 +118,85 @@ public class Game implements Runnable {
 		g = bs.getDrawGraphics();
 
 		g.setColor(Color.GREEN);
+		g.drawString(FPSs, 100, 100);
+		g.setColor(Color.RED);
+		g.drawString(UPSs, 100, 120);
 		// g.fill3DRect(100, 100, 200, 200, true);
 
 		display.processImage(g, mem);
 
+		g.setColor(Color.GREEN);
 		g.drawString(FPSs, 100, 100);
+		g.setColor(Color.RED);
 		g.drawString(UPSs, 100, 120);
 
 		bs.show();
 		g.dispose();
+	}
+
+	public class UpdateThread extends TickThread {
+
+		public UpdateThread(double tickRate, int[] mem, String name) {
+			super(tickRate, mem, name);
+		}
+
+		public void run() {
+			now = System.nanoTime();
+			while (true) {
+
+				try {
+
+					for (int i = 0; i < 1; i++) {
+						super.mem = ant.updateAnt(super.mem, width, height, colors);
+						ant.drawAnt(super.mem, width, height, colors);
+						// super.mem = ant2.updateAnt(super.mem, width, height, colors);
+						// ant2.drawAnt(super.mem, width, height, colors);
+					}
+
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					System.exit(701);
+				}
+				super.run();
+			}
+		}
+	}
+
+	public class RenderThread extends TickThread {
+
+		private UpdateThread ut;
+
+		public RenderThread(double tickRate, int[] mem, String name, UpdateThread ut) {
+			super(tickRate, mem, name);
+			this.ut = ut;
+		}
+
+		public void run() {
+			now = System.nanoTime();
+			while (true) {
+
+				try {
+
+					mem = ut.getMem();
+
+					g = bs.getDrawGraphics();
+
+					display.processImage(g, mem);
+
+					bs.show();
+					g.dispose();
+
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					System.exit(701);
+				}
+
+				super.run();
+			}
+
+		}
 	}
 
 	// Game loop
@@ -166,6 +237,12 @@ public class Game implements Runnable {
 		String FPSs = new String();
 		String UPSs = new String();
 
+		UpdateThread updateThread = new UpdateThread(1000, mem, "UpdateThread");
+		RenderThread renderThread = new RenderThread(60, mem, "RenderThread", updateThread);
+
+		updateThread.start();
+		renderThread.start();
+
 		while (running) {
 
 			now = System.nanoTime();
@@ -184,7 +261,7 @@ public class Game implements Runnable {
 
 				try {
 
-					tick(1);
+					// tick(1);
 
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -206,8 +283,8 @@ public class Game implements Runnable {
 				 */
 
 				try {
-
-					render(FPSs, UPSs);
+					// mem = updateThread.getMemm();
+					// render(FPSs, UPSs);
 
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -221,8 +298,7 @@ public class Game implements Runnable {
 			}
 
 			if (timer >= 1000000000) {
-
-				System.out.println("FPS: " + frames + ", UPS: " + ticks);
+				// System.out.println("FPS: " + frames + ", UPS: " + ticks);
 				FPSs = String.valueOf(frames);
 				UPSs = String.valueOf(ticks);
 				ticks = 0;

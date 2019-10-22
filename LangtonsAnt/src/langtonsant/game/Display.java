@@ -1,4 +1,4 @@
-package langtonsant;
+package langtonsant.game;
 
 import java.awt.Canvas;
 import java.awt.Color;
@@ -37,7 +37,7 @@ public class Display {
 		frame.setResizable(false);
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
-		frame.setAlwaysOnTop(true);
+		frame.setAlwaysOnTop(false);
 
 		canvas = new Canvas();
 		canvas.setPreferredSize(new Dimension(width, height));
