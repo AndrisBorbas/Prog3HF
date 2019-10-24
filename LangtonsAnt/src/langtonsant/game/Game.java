@@ -3,6 +3,11 @@ package langtonsant.game;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.concurrent.locks.LockSupport;
 
 import langtonsant.entity.Ant;
 
@@ -18,15 +23,11 @@ public class Game implements Runnable {
 	private Thread thread;
 
 	private Ant ant;
-	// private Ant ant2;
+	private Ant ant2;
 	private int scale, spacing, antmargin;
 	private String instructionset;
 	protected int[] mem;
-	/*
-	 * private final Color[] colors = { Color.DARK_GRAY, new Color(96, 57, 19),
-	 * Color.gray, Color.WHITE, Color.blue, Color.RED, Color.green, Color.PINK,
-	 * Color.magenta };
-	 */
+
 	private Color[] colors = { Color.getHSBColor(0f, 0.9f, 0.7f), Color.getHSBColor(0.05555f, 0.9f, 0.7f),
 			Color.getHSBColor(0.11111f, 0.9f, 0.7f), Color.getHSBColor(0.16666f, 0.9f, 0.7f),
 			Color.getHSBColor(0.22222f, 0.9f, 0.7f), Color.getHSBColor(0.27777f, 0.9f, 0.7f),
@@ -38,7 +39,8 @@ public class Game implements Runnable {
 			Color.getHSBColor(0.88888f, 0.9f, 0.7f), Color.getHSBColor(0.94444f, 0.9f, 0.7f),
 			Color.getHSBColor(0.99999f, 0.9f, 0.7f) };
 
-	public Game(String title, int width, int height, int scale, int spacing, int antmargin, String instructionset) {
+	public Game(String title, int width, int height, int scale, int spacing, int antmargin, String instructionset)
+			throws IOException {
 		this.title = title;
 		this.width = width;
 		this.height = height;
@@ -61,8 +63,7 @@ public class Game implements Runnable {
 		ant = new Ant(width / 2, height / 2, scale, spacing, antmargin, instructionset);
 		display = new Display(title, width, height, ant);
 
-		// ant2 = new Ant(width / 8 * 5 - 5, height / 2, scale, spacing, antmargin,
-		// instructionset);
+		ant2 = new Ant(width / 8 * 5 - 5, height / 2, scale, spacing, antmargin, instructionset);
 
 		bs = display.getCanvas().getBufferStrategy();
 		if (bs == null) {
@@ -96,48 +97,66 @@ public class Game implements Runnable {
 		}
 	}
 
-	// Game logic tick
+	/**
+	 * Updates the ant by the amount specified in <i>stepper</i>.
+	 * 
+	 * @param stepper the amount of times the ant should update
+	 */
 	private void tick(int stepper) {
 		for (int i = 0; i < stepper; i++) {
 			mem = ant.updateAnt(mem, width, height, colors);
 			ant.drawAnt(mem, width, height, colors);
-			// mem = ant2.updateAnt(mem, width, height, colors);
-			// ant2.drawAnt(mem, width, height, colors);
+			mem = ant2.updateAnt(mem, width, height, colors);
+			ant2.drawAnt(mem, width, height, colors);
 		}
 	}
 
-	// Render tick
-	private void render(String FPSs, String UPSs) throws Exception {
+	/**
+	 * Updates the ant once.
+	 */
+	private void tick() {
+		tick(1);
+	}
 
-		/*
-		 * bs = display.getCanvas().getBufferStrategy(); if (bs == null) {
-		 * display.getCanvas().createBufferStrategy(1); bs =
-		 * display.getCanvas().getBufferStrategy(); } g = bs.getDrawGraphics();
-		 */
+	/**
+	 * Draws the image from memory to the screen.
+	 *
+	 * @param FPSs the property name
+	 * @throws Exception if there is a graphics error.
+	 */
+	private void render(String FPSs, String UPSs) throws Exception {
 
 		g = bs.getDrawGraphics();
 
 		g.setColor(Color.GREEN);
-		g.drawString(FPSs, 100, 100);
+		g.drawString(FPSs, 20, 20);
 		g.setColor(Color.RED);
-		g.drawString(UPSs, 100, 120);
-		// g.fill3DRect(100, 100, 200, 200, true);
+		g.drawString(UPSs, 20, 40);
 
 		display.processImage(g, mem);
 
 		g.setColor(Color.GREEN);
-		g.drawString(FPSs, 100, 100);
+		g.drawString(FPSs, 20, 20);
 		g.setColor(Color.RED);
-		g.drawString(UPSs, 100, 120);
+		g.drawString(UPSs, 20, 40);
 
 		bs.show();
 		g.dispose();
 	}
 
+	/**
+	 * Handles the timing of updating the ant.
+	 */
 	public class UpdateThread extends TickThread {
 
-		public UpdateThread(double tickRate, int[] mem, String name) {
-			super(tickRate, mem, name);
+		/**
+		 * UpdateThread constructor.
+		 *
+		 * @param tickRate sets the internal tick rate.
+		 * @param name     the name of this thread.
+		 */
+		public UpdateThread(long tickRate, String name) {
+			super(tickRate, name);
 		}
 
 		public void run() {
@@ -146,43 +165,61 @@ public class Game implements Runnable {
 
 				try {
 
-					for (int i = 0; i < 1; i++) {
-						super.mem = ant.updateAnt(super.mem, width, height, colors);
-						ant.drawAnt(super.mem, width, height, colors);
-						// super.mem = ant2.updateAnt(super.mem, width, height, colors);
-						// ant2.drawAnt(super.mem, width, height, colors);
-					}
+					tick(250);
 
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-					System.exit(701);
+					System.exit(601);
 				}
+
+				lapse += now - before;
+
+				if (lapse >= 1_000_000_000L) {
+					// System.out.println("UPS: " + ticks);
+					lapse -= 1_000_000_000L;
+					ticks = 0;
+				}
+				ticks++;
+
 				super.run();
 			}
 		}
 	}
 
+	/**
+	 * Handles the timing of drawing to the screen.
+	 */
 	public class RenderThread extends TickThread {
 
 		private UpdateThread ut;
 
-		public RenderThread(double tickRate, int[] mem, String name, UpdateThread ut) {
-			super(tickRate, mem, name);
+		/**
+		 * RenderThread constructor.
+		 *
+		 * @param tickRate sets the internal tick rate.
+		 * @param name     the name of this thread.
+		 * @param ut       reference to the update thread.
+		 */
+		public RenderThread(long tickRate, String name, UpdateThread ut) {
+			super(tickRate, name);
 			this.ut = ut;
 		}
 
 		public void run() {
 			now = System.nanoTime();
+			boolean s = false;
 			while (true) {
+
+				super.run();
+
+				lapse += now - before;
 
 				try {
 
-					mem = ut.getMem();
-
-					g = bs.getDrawGraphics();
-
-					display.processImage(g, mem);
+					render(("FPS: " + String.format("%.1f", (double) (ticks) / ((double) (lapse) / 1_000_000_000.0))),
+							("UPS: " + String.format("%.1f",
+									(double) (ut.ticks) / ((double) (lapse) / 1_000_000_000.0))));
 
 					bs.show();
 					g.dispose();
@@ -193,9 +230,16 @@ public class Game implements Runnable {
 					System.exit(701);
 				}
 
-				super.run();
-			}
+				// lapse += now - before;
 
+				if (lapse >= 1_000_000_000L) {
+					// System.out.println("FPS: " + ticks);
+					lapse -= 1_000_000_000L;
+					ticks = 0;
+				}
+				ticks++;
+
+			}
 		}
 	}
 
@@ -204,111 +248,13 @@ public class Game implements Runnable {
 
 		init();
 
-		// update rate limiter
-		double tickRate = 1200;
-		double timePerTick = 1000000000.0 / tickRate;
-		double tickDelta = 0;
-
-		// framerate limiter
-		double frameRate = 60;
-		double timePerFrame = 1000000000.0 / frameRate;
-		double frameDelta = 0;
-
-		// delta timer
-		long now;
-		long lastTime = System.nanoTime();
-		@SuppressWarnings("unused")
-		long frameCount = 0L;
-
-		// framerate and update rate counters
-		long timer = 0L;
-		int ticks = 0;
-		int frames = 0;
-
-		// frametime counter
-		@SuppressWarnings("unused")
-		double frameTime = 0;
-		long frameNow = 1L;
-		long frameLast = 1L;
-
-		@SuppressWarnings("unused")
-		int exit = 0;
-
-		String FPSs = new String();
-		String UPSs = new String();
-
-		UpdateThread updateThread = new UpdateThread(1000, mem, "UpdateThread");
-		RenderThread renderThread = new RenderThread(60, mem, "RenderThread", updateThread);
+		UpdateThread updateThread = new UpdateThread(120L, "UpdateThread");
+		RenderThread renderThread = new RenderThread(60L, "RenderThread", updateThread);
 
 		updateThread.start();
 		renderThread.start();
 
-		while (running) {
-
-			now = System.nanoTime();
-			tickDelta += (now - lastTime) / timePerTick;
-			frameDelta += (now - lastTime) / timePerFrame;
-			timer += now - lastTime;
-			lastTime = now;
-
-			/*
-			 * 
-			 * Game input
-			 * 
-			 */
-
-			if (tickDelta >= 1) {
-
-				try {
-
-					// tick(1);
-
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					System.exit(701);
-				}
-
-				ticks++;
-				tickDelta--;
-			}
-
-			if (frameDelta >= 1) {
-
-				frameTime = (frameNow - frameLast) / 1000000.0;
-				frameLast = frameNow;
-				frameNow = System.nanoTime();
-				/*
-				 * System.out.println("FrameTime: " + frameTime);
-				 */
-
-				try {
-					// mem = updateThread.getMemm();
-					// render(FPSs, UPSs);
-
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					System.exit(701);
-				}
-
-				frameCount++;
-				frames++;
-				frameDelta--;
-			}
-
-			if (timer >= 1000000000) {
-				// System.out.println("FPS: " + frames + ", UPS: " + ticks);
-				FPSs = String.valueOf(frames);
-				UPSs = String.valueOf(ticks);
-				ticks = 0;
-				frames = 0;
-				timer = 0;
-				// if(++exit==10) System.exit(101);
-			}
-		}
-
-		stop();
+		// stop();
 	}
 
 }

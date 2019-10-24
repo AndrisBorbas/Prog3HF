@@ -1,12 +1,20 @@
 package langtonsant;
 
+import java.io.IOException;
+
 import langtonsant.game.Game;
 
 public class Main {
 
-	public static void main(String[] args) {
+	/**
+	 * Entry-point of the application.
+	 * 
+	 * @param args command-line arguments
+	 * @throws IOException
+	 */
+	public static void main(String[] args) throws IOException {
 
-		Game game = new Game("Langtons's Ant", 1000, 1000, 3, 1, 1, "LLRR");
+		Game game = new Game("Langtons's Ant", 1000, 1000, 1, 0, 1, "RRLLLRLLLRRR");
 
 		game.start();
 

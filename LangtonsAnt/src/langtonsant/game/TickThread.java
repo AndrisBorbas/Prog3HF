@@ -1,54 +1,57 @@
 package langtonsant.game;
 
+/**
+ * A thread with a built-in tick rate based sleep system.
+ */
 public abstract class TickThread extends Thread {
 
-	// update rate limiter
-	protected double tickRate, timePerTick, tickDelta = 0;
+	// Update rate timer
+	private long timePerTick;
 
-	// delta timer
-	protected long now, lastTime, frameCount = 0L, timer = 0L, timeTilNextFrame = 0L, millisTilNextFrame = 0L;
+	// Time handling
+	protected long now, before, timeTilNextFrame = 0L, millisTilNextFrame = 0L, lapse = 0L;
 
 	// framerate and update rate counters
-	protected int ticks = 0, frames = 0, nanosTilNextFrame = 0;
+	protected int ticks = 0, nanosTilNextFrame = 0;
 
-	// image
-	protected int[] mem;
-
-	public TickThread(double tickRate, int[] mem, String name) {
-		this.tickRate = tickRate;
-		timePerTick = 1000000000.0 / tickRate;
-		this.mem = mem;
-		lastTime = System.nanoTime();
+	/**
+	 * TickThread constructor.
+	 *
+	 * @param tickRate sets the internal tick rate.
+	 * @param name     the name of this thread.
+	 */
+	public TickThread(long tickRate, String name) {
+		timePerTick = 1_000_000_000L / tickRate;
+		before = System.nanoTime();
 		this.setName(name);
 	}
 
+	/**
+	 * Sleeps for the necessary time to hit the <i>tickRate</i> if the operation in
+	 * the tick did not last the whole tick.
+	 */
 	public void run() {
-		lastTime = now;
+		before = now;
 		now = System.nanoTime();
-		
-		timeTilNextFrame = (long) (timePerTick - (now - lastTime));
+
+		timeTilNextFrame = timePerTick - (now - before);
 		if (timeTilNextFrame > 0) {
-			millisTilNextFrame = timeTilNextFrame / 1000000;
-			nanosTilNextFrame = (int) (timeTilNextFrame % 1000000);
+			millisTilNextFrame = timeTilNextFrame / 1_000_000L;
+			nanosTilNextFrame = (int) (timeTilNextFrame) % 1_000_000;
 		} else {
-			millisTilNextFrame = 0;
+			millisTilNextFrame = 0L;
 			nanosTilNextFrame = 0;
+			timeTilNextFrame = 0L;
 		}
 
 		try {
-			sleep(millisTilNextFrame, nanosTilNextFrame);
+			Thread.sleep(millisTilNextFrame, nanosTilNextFrame);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
 
-	public synchronized int[] getMem() {
-		return this.mem;
-	}
-
-	public synchronized void setMem(int[] mem) {
-		this.mem = mem;
+		now = System.nanoTime();
 	}
 
 }
