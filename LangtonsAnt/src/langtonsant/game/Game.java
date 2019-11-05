@@ -19,8 +19,11 @@ public class Game implements Runnable {
 
 	protected BufferStrategy bs;
 	protected Graphics g;
-	private boolean running = false;
+	// private boolean running = false;
 	private Thread thread;
+
+	UpdateThread updateThread;
+	RenderThread renderThread;
 
 	private Ant ant;
 	private Ant ant2;
@@ -61,9 +64,9 @@ public class Game implements Runnable {
 			}
 		}
 		ant = new Ant(width / 2, height / 2, scale, spacing, antmargin, instructionset);
-		display = new Display(title, width, height, ant);
+		display = new Display(title, this, width, height, ant);
 
-		ant2 = new Ant(width / 8 * 5 - 5, height / 2, scale, spacing, antmargin, instructionset);
+		ant2 = new Ant(width / 8 * 5 - 6, height / 2, scale, spacing, antmargin, instructionset);
 
 		bs = display.getCanvas().getBufferStrategy();
 		if (bs == null) {
@@ -75,9 +78,9 @@ public class Game implements Runnable {
 
 	// Threaded Start
 	public synchronized void start() {
-		if (running)
-			return;
-		running = true;
+		/*
+		 * if (running) return; running = true;
+		 */
 		thread = new Thread(this);
 		thread.setName("Game");
 		thread.start();
@@ -85,10 +88,9 @@ public class Game implements Runnable {
 
 	// Threaded stop
 	public synchronized void stop() {
-		if (!running)
-			return;
-		running = false;
-
+		/*
+		 * if (!running) return; running = false;
+		 */
 		try {
 			thread.join();
 		} catch (InterruptedException e) {
@@ -102,7 +104,7 @@ public class Game implements Runnable {
 	 * 
 	 * @param stepper the amount of times the ant should update
 	 */
-	private void tick(int stepper) {
+	public void tick(int stepper) {
 		for (int i = 0; i < stepper; i++) {
 			mem = ant.updateAnt(mem, width, height, colors);
 			ant.drawAnt(mem, width, height, colors);
@@ -127,18 +129,16 @@ public class Game implements Runnable {
 	private void render(String FPSs, String UPSs) throws Exception {
 
 		g = bs.getDrawGraphics();
-
-		g.setColor(Color.GREEN);
-		g.drawString(FPSs, 20, 20);
-		g.setColor(Color.RED);
-		g.drawString(UPSs, 20, 40);
-
+		/*
+		 * g.setColor(Color.GREEN); g.drawString(FPSs, width-60, 20);
+		 * g.setColor(Color.RED); g.drawString(UPSs, width-67, 40);
+		 */
 		display.processImage(g, mem);
 
 		g.setColor(Color.GREEN);
-		g.drawString(FPSs, 20, 20);
+		g.drawString(FPSs, width - 60, 20);
 		g.setColor(Color.RED);
-		g.drawString(UPSs, 20, 40);
+		g.drawString(UPSs, width - 67, 40);
 
 		bs.show();
 		g.dispose();
@@ -163,32 +163,46 @@ public class Game implements Runnable {
 			now = System.nanoTime();
 			while (true) {
 
-				try {
+				if (running) {
 
-					tick(250);
+					try {
 
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					System.exit(601);
+						tick(10);
+
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						System.exit(601);
+					}
+
+					super.run();
+
+					lapse += now - before;
+
+					if (lapse >= 1_000_000_000L) {
+						// System.out.println("UPS: " + ticks);
+						lapse -= 1_000_000_000L;
+						ticks = 0;
+					}
+					ticks++;
+
+				} else {
+					try {
+						Thread.sleep(timePerTick / 1_000_000L);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 
-				lapse += now - before;
-
-				if (lapse >= 1_000_000_000L) {
-					// System.out.println("UPS: " + ticks);
-					lapse -= 1_000_000_000L;
-					ticks = 0;
-				}
-				ticks++;
-
-				super.run();
 			}
 		}
 	}
 
 	/**
 	 * Handles the timing of drawing to the screen.
+	 * 
+	 * @param ut reference to the update thread.
 	 */
 	public class RenderThread extends TickThread {
 
@@ -209,17 +223,21 @@ public class Game implements Runnable {
 		public void run() {
 			now = System.nanoTime();
 			boolean s = false;
+			double lastFPS = 0, nowFPS = 0, lastUPS = 0, nowUPS = 0;
 			while (true) {
 
-				super.run();
+				lastFPS = nowFPS;
+				lastUPS = nowUPS;
 
-				lapse += now - before;
+				nowFPS = (double) (ticks) / ((double) (lapse) / 1_000_000_000.0);
+				nowUPS = (double) (ut.ticks) / ((double) (lapse) / 1_000_000_000.0);
 
 				try {
-
-					render(("FPS: " + String.format("%.1f", (double) (ticks) / ((double) (lapse) / 1_000_000_000.0))),
-							("UPS: " + String.format("%.1f",
-									(double) (ut.ticks) / ((double) (lapse) / 1_000_000_000.0))));
+					if(ut.isRunning())
+					render(("FPS: " + String.format("%.1f", (nowFPS + lastFPS) / 2)),
+							("UPS: " + String.format("%.1f", (nowUPS + lastUPS) / 2)));
+					else render(("FPS: " + String.format("%.1f", (nowFPS + lastFPS) / 2)),
+							("UPS: paused"));
 
 					bs.show();
 					g.dispose();
@@ -230,7 +248,9 @@ public class Game implements Runnable {
 					System.exit(701);
 				}
 
-				// lapse += now - before;
+				super.run();
+
+				lapse += now - before;
 
 				if (lapse >= 1_000_000_000L) {
 					// System.out.println("FPS: " + ticks);
@@ -248,8 +268,8 @@ public class Game implements Runnable {
 
 		init();
 
-		UpdateThread updateThread = new UpdateThread(120L, "UpdateThread");
-		RenderThread renderThread = new RenderThread(60L, "RenderThread", updateThread);
+		updateThread = new UpdateThread(120L, "UpdateThread");
+		renderThread = new RenderThread(60L, "RenderThread", updateThread);
 
 		updateThread.start();
 		renderThread.start();
