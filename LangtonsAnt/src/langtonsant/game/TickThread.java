@@ -25,8 +25,9 @@ public abstract class TickThread extends Thread {
 	public TickThread(long tickRate, String name) {
 		timePerTick = 1_000_000_000L / tickRate;
 		before = System.nanoTime();
+		now=System.nanoTime();
 		this.setName(name);
-		setRunning(true);
+		setRunning(false);
 	}
 
 	/**

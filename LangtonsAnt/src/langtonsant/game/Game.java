@@ -2,20 +2,23 @@ package langtonsant.game;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferStrategy;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.concurrent.locks.LockSupport;
 
 import langtonsant.entity.Ant;
 
-public class Game implements Runnable {
+public class Game implements Runnable, KeyEventDispatcher {
 
 	private Display display;
 	public int width, height;
 	public String title;
+
+	int steps = 0;
+
+	public static int saves = 0;
 
 	protected BufferStrategy bs;
 	protected Graphics g;
@@ -57,20 +60,18 @@ public class Game implements Runnable {
 
 	// Initialization
 	private void init() {
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				// Color pixel at x,y
-				mem[x + y * width] = Color.BLACK.getRGB();
-			}
-		}
+		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
+
+		clearMem();
+
 		ant = new Ant(width / 2, height / 2, scale, spacing, antmargin, instructionset);
-		display = new Display(title, this, width, height, ant);
+		display = new Display(title, this, width, height, mem);
 
 		ant2 = new Ant(width / 8 * 5 - 6, height / 2, scale, spacing, antmargin, instructionset);
 
 		bs = display.getCanvas().getBufferStrategy();
 		if (bs == null) {
-			display.getCanvas().createBufferStrategy(1);
+			display.getCanvas().createBufferStrategy(2);
 			bs = display.getCanvas().getBufferStrategy();
 		}
 
@@ -96,6 +97,15 @@ public class Game implements Runnable {
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+
+	public synchronized void clearMem() {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				// Color pixel at x,y
+				mem[x + y * width] = Color.BLACK.getRGB();
+			}
 		}
 	}
 
@@ -128,6 +138,8 @@ public class Game implements Runnable {
 	 */
 	private void render(String FPSs, String UPSs) throws Exception {
 
+		// setIgnoreRepaint(true);
+
 		g = bs.getDrawGraphics();
 		/*
 		 * g.setColor(Color.GREEN); g.drawString(FPSs, width-60, 20);
@@ -136,12 +148,13 @@ public class Game implements Runnable {
 		display.processImage(g, mem);
 
 		g.setColor(Color.GREEN);
-		g.drawString(FPSs, width - 60, 20);
+		g.drawString(FPSs, width - 82, 20);
 		g.setColor(Color.RED);
-		g.drawString(UPSs, width - 67, 40);
+		g.drawString(UPSs, width - 82, 40);
 
 		bs.show();
 		g.dispose();
+
 	}
 
 	/**
@@ -233,14 +246,14 @@ public class Game implements Runnable {
 				nowUPS = (double) (ut.ticks) / ((double) (lapse) / 1_000_000_000.0);
 
 				try {
-					if(ut.isRunning())
-					render(("FPS: " + String.format("%.1f", (nowFPS + lastFPS) / 2)),
-							("UPS: " + String.format("%.1f", (nowUPS + lastUPS) / 2)));
-					else render(("FPS: " + String.format("%.1f", (nowFPS + lastFPS) / 2)),
-							("UPS: paused"));
-
-					bs.show();
-					g.dispose();
+					if (ut.isRunning())
+						render(("FPS: " + String.format("%.1f", (nowFPS + lastFPS) / 2)),
+								("UPS: " + String.format("%.1f", (nowUPS + lastUPS) / 2)));
+					else
+						render(("FPS: " + String.format("%.1f", (nowFPS + lastFPS) / 2)), ("UPS: paused"));
+					/*
+					 * bs.show(); g.dispose();
+					 */
 
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -275,6 +288,22 @@ public class Game implements Runnable {
 		renderThread.start();
 
 		// stop();
+	}
+
+	public String getInstructionset() {
+		return instructionset;
+	}
+
+	@Override
+	public boolean dispatchKeyEvent(KeyEvent e) {
+		//System.out.println(e);
+		if (e.getID() == KeyEvent.KEY_RELEASED) {
+			switch (e.getKeyCode()) {
+			case 32:
+				display.pause();
+			}
+		}
+		return false;
 	}
 
 }
