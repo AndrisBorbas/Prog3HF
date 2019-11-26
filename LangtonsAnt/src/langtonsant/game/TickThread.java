@@ -5,7 +5,7 @@ package langtonsant.game;
  */
 public abstract class TickThread extends Thread {
 
-	protected boolean running;
+	protected boolean running = true, paused = false;
 
 	// Update rate timer
 	protected long timePerTick;
@@ -25,9 +25,8 @@ public abstract class TickThread extends Thread {
 	public TickThread(long tickRate, String name) {
 		timePerTick = 1_000_000_000L / tickRate;
 		before = System.nanoTime();
-		now=System.nanoTime();
+		now = System.nanoTime();
 		this.setName(name);
-		setRunning(false);
 	}
 
 	/**
@@ -64,6 +63,14 @@ public abstract class TickThread extends Thread {
 
 	public void setRunning(boolean running) {
 		this.running = running;
+	}
+
+	public boolean isPaused() {
+		return paused;
+	}
+
+	public void setPaused(boolean paused) {
+		this.paused = paused;
 	}
 
 }

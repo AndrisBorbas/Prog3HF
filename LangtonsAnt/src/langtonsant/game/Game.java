@@ -10,7 +10,7 @@ import java.io.IOException;
 
 import langtonsant.entity.Ant;
 
-public class Game implements Runnable, KeyEventDispatcher {
+public class Game implements Runnable/*, KeyEventDispatcher*/ {
 
 	private Display display;
 	public int width, height;
@@ -23,7 +23,7 @@ public class Game implements Runnable, KeyEventDispatcher {
 	protected BufferStrategy bs;
 	protected Graphics g;
 	// private boolean running = false;
-	private Thread thread;
+	public Thread thread;
 
 	UpdateThread updateThread;
 	RenderThread renderThread;
@@ -60,7 +60,7 @@ public class Game implements Runnable, KeyEventDispatcher {
 
 	// Initialization
 	private void init() {
-		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
+		//KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
 
 		clearMem();
 
@@ -92,8 +92,18 @@ public class Game implements Runnable, KeyEventDispatcher {
 		/*
 		 * if (!running) return; running = false;
 		 */
+		
+		
+		
 		try {
-			thread.join();
+			System.out.println("wat");
+			updateThread.join();
+			
+			renderThread.join();
+			System.out.println("rd");
+			//thread.join();
+			//display.dispose();
+			System.out.println("wasd");
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -170,13 +180,15 @@ public class Game implements Runnable, KeyEventDispatcher {
 		 */
 		public UpdateThread(long tickRate, String name) {
 			super(tickRate, name);
+			setPaused(true);
+			setRunning(false);
 		}
 
 		public void run() {
 			now = System.nanoTime();
-			while (true) {
+			while (running) {
 
-				if (running) {
+				if (!paused) {
 
 					try {
 
@@ -209,6 +221,7 @@ public class Game implements Runnable, KeyEventDispatcher {
 				}
 
 			}
+			
 		}
 	}
 
@@ -235,9 +248,8 @@ public class Game implements Runnable, KeyEventDispatcher {
 
 		public void run() {
 			now = System.nanoTime();
-			boolean s = false;
 			double lastFPS = 0, nowFPS = 0, lastUPS = 0, nowUPS = 0;
-			while (true) {
+			while (running) {
 
 				lastFPS = nowFPS;
 				lastUPS = nowUPS;
@@ -246,7 +258,7 @@ public class Game implements Runnable, KeyEventDispatcher {
 				nowUPS = (double) (ut.ticks) / ((double) (lapse) / 1_000_000_000.0);
 
 				try {
-					if (ut.isRunning())
+					if (!ut.isPaused())
 						render(("FPS: " + String.format("%.1f", (nowFPS + lastFPS) / 2)),
 								("UPS: " + String.format("%.1f", (nowUPS + lastUPS) / 2)));
 					else
@@ -273,6 +285,7 @@ public class Game implements Runnable, KeyEventDispatcher {
 				ticks++;
 
 			}
+			System.out.println("stop");
 		}
 	}
 
@@ -287,23 +300,21 @@ public class Game implements Runnable, KeyEventDispatcher {
 		updateThread.start();
 		renderThread.start();
 
-		// stop();
+		stop();
 	}
 
 	public String getInstructionset() {
 		return instructionset;
 	}
-
+	/*
 	@Override
 	public boolean dispatchKeyEvent(KeyEvent e) {
-		//System.out.println(e);
-		if (e.getID() == KeyEvent.KEY_RELEASED) {
-			switch (e.getKeyCode()) {
-			case 32:
-				display.pause();
-			}
-		}
+		// System.out.println(e);
+		
+		  if (e.getID() == KeyEvent.KEY_RELEASED) { switch (e.getKeyCode()) { case 32:
+		  display.pause(); } }
+		 
 		return false;
 	}
-
+	*/
 }

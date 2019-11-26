@@ -2,7 +2,6 @@ package langtonsant.game;
 
 import java.awt.BorderLayout;
 import java.awt.Canvas;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -10,6 +9,8 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.MemoryImageSource;
 import java.io.File;
@@ -75,6 +76,46 @@ public class Display extends JFrame {
 
 		menuBar = new JMenuBar();
 
+		this.addKeyListener(new KeyListener() {
+
+			@Override
+			public void keyTyped(KeyEvent e) {
+				switch (e.getKeyChar()) {
+				case ' ':
+					pause();
+					break;
+				case 'j':
+					game.tick(1);
+					break;
+				case 'k':
+					game.tick(100);
+					break;
+				case 'l':
+					game.tick(10_000);
+					break;
+				case 'c':
+					game.clearMem();
+					break;
+				case 'p':
+					//game.updateThread.setRunning(false);
+					game.renderThread.setRunning(false);
+					break;
+				}
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+		});
+
 		crateMenuBar();
 
 		this.setJMenuBar(menuBar);
@@ -84,13 +125,13 @@ public class Display extends JFrame {
 	}
 
 	public boolean pause() {
-		if (game.updateThread.isRunning()) {
-			game.updateThread.setRunning(false);
-			editMenuPause.setText("Resume");
+		if (game.updateThread.isPaused()) {
+			game.updateThread.setPaused(false);
+			editMenuPause.setText("Resume (space)");
 			return false;
 		} else {
-			game.updateThread.setRunning(true);
-			editMenuPause.setText("Pause");
+			game.updateThread.setPaused(true);
+			editMenuPause.setText("Pause (space)");
 			return true;
 		}
 	}
@@ -104,11 +145,17 @@ public class Display extends JFrame {
 				JFrame temp = new JFrame();
 				JFileChooser chooser = new JFileChooser(System.getProperty("user.dir"));
 				chooser.setDialogType(JFileChooser.SAVE_DIALOG);
+				chooser.setDialogTitle("Specify a file to save");
+				chooser.setSelectedFile(new File("export.png"));
 
 				int returnVal = chooser.showSaveDialog(temp);
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
-					System.out.println("You chose to open this file: " + chooser.getSelectedFile().getName());
-					exportImage(chooser.getSelectedFile());
+					File f = chooser.getSelectedFile();
+					if (!(f.getName().contains(".png"))) {
+						f = new File(f.getName() + ".png");
+					}
+					System.out.println("You chose to save to: " + f.getName());
+					exportImage(f);
 				}
 			}
 		});
@@ -122,13 +169,33 @@ public class Display extends JFrame {
 		menuBar.add(fileMenu);
 
 		JMenu editMenu = new JMenu("Edit");
-		editMenuPause = new JMenuItem("Start");
-		JMenuItem editMenuClear = new JMenuItem("Clear Screen");
+		editMenuPause = new JMenuItem("Start (space)");
+		JMenuItem editMenuStep1 = new JMenuItem("Step 1 (j)");
+		JMenuItem editMenuStep2 = new JMenuItem("Step 100 (k)");
+		JMenuItem editMenuStep3 = new JMenuItem("Step 10000 (l)");
+		JMenuItem editMenuClear = new JMenuItem("Clear Screen (c)");
 		editMenuPause.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				pause();
 			}
 		});
+
+		editMenuStep1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				game.tick(1);
+			}
+		});
+		editMenuStep2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				game.tick(100);
+			}
+		});
+		editMenuStep3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				game.tick(10_000);
+			}
+		});
+
 		editMenuClear.setToolTipText("This affects simulation as well");
 		editMenuClear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -136,6 +203,9 @@ public class Display extends JFrame {
 			}
 		});
 		editMenu.add(editMenuPause);
+		editMenu.add(editMenuStep1);
+		editMenu.add(editMenuStep2);
+		editMenu.add(editMenuStep3);
 		editMenu.add(editMenuClear);
 		menuBar.add(editMenu);
 
