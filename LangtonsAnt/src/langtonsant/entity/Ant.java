@@ -36,21 +36,20 @@ public class Ant {
 		for (int y = (ypos - scale + antmargin); y < (ypos + scale - spacing - antmargin); y++) {
 			for (int x = (xpos - scale + antmargin); x < (xpos + scale - spacing - antmargin); x++) {
 				if (x < 0 || x >= width || y < 0 || y >= height) {
-					throw new RuntimeException("Ant OOB");
+					throw new RuntimeException("Ant draw OOB");
 				}
 				mem[x + y * width] = Color.white.getRGB();
 			}
 		}
 		return mem;
-
 	}
 
 	public int[] updateAnt(int[] mem, int width, int height, Color[] colors) {
-		int xcheck = (xpos - scale - spacing + antmargin);
-		int ycheck = (ypos - scale - spacing + antmargin);
+		int xcheck = (xpos - scale - 1 + antmargin);
+		int ycheck = (ypos - scale - 1 + antmargin);
 
 		if (xcheck < 0 || xcheck > width || ycheck < 0 || ycheck > height) {
-			throw new RuntimeException("Ant OOB");
+			throw new RuntimeException("Ant pre-update OOB, how?");
 		}
 		boolean isNew = true;
 		for (int i = 0; i < colors.length; i++) {
