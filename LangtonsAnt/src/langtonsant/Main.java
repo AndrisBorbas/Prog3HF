@@ -14,7 +14,7 @@ public class Main {
 	/**
 	 * Whether to get the Systems UI.
 	 */
-	public static boolean isDarkMode = false;
+	public static boolean isDarkMode = true;
 
 	/**
 	 * Entry-point of the application.
