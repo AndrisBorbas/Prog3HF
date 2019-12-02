@@ -51,11 +51,11 @@ public class Game implements Runnable {
 	/**
 	 * The thread which updates the ants position
 	 */
-	UpdateThread updateThread;
+	public UpdateThread updateThread;
 	/**
 	 * The thread which renders the ant(s) to the screen
 	 */
-	RenderThread renderThread;
+	public RenderThread renderThread;
 
 	/**
 	 * Should the simulation run with 2 ants
@@ -82,6 +82,8 @@ public class Game implements Runnable {
 	 * The memory location of the image where the ants "draw"
 	 */
 	protected int[] mem;
+
+	private static boolean once = true;
 
 	/**
 	 * The LUT for coloring the image and checking for instruction
@@ -128,6 +130,8 @@ public class Game implements Runnable {
 	 * (Re)Initializes the memory, ant(s) and the graphics with the framebuffer.
 	 */
 	private void init() {
+
+		once = true;
 
 		clearMem();
 
@@ -178,12 +182,22 @@ public class Game implements Runnable {
 	 * @param stepper the amount of times the ant should update
 	 */
 	public void tick(int stepper) {
-		for (int i = 0; i < stepper; i++) {
-			mem = ant.updateAnt(mem, width, height, colors);
-			ant.drawAnt(mem, width, height, colors);
-			if (multiAnt) {
-				mem = ant2.updateAnt(mem, width, height, colors);
-				ant2.drawAnt(mem, width, height, colors);
+		try {
+			for (int i = 0; i < stepper; i++) {
+				mem = ant.updateAnt(mem, width, height, colors);
+				ant.drawAnt(mem, width, height, colors);
+				if (multiAnt) {
+					mem = ant2.updateAnt(mem, width, height, colors);
+					ant2.drawAnt(mem, width, height, colors);
+				}
+			}
+		} catch (ArrayIndexOutOfBoundsException e) {
+
+			e.printStackTrace();
+			if (once) {
+				once = false;
+				updateThread.setPaused(true);
+				new Setup("New simulation", this);
 			}
 		}
 	}
@@ -223,6 +237,8 @@ public class Game implements Runnable {
 	 */
 	public class UpdateThread extends TickThread {
 
+		public int stepper = 1;
+
 		/**
 		 * UpdateThread constructor.
 		 *
@@ -242,7 +258,8 @@ public class Game implements Runnable {
 
 					try {
 
-						tick();
+						tick(stepper);
+						stepper = 1;
 
 					} catch (Exception e) {
 						// TODO Auto-generated catch block

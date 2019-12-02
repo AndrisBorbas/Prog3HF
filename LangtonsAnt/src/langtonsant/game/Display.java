@@ -130,21 +130,19 @@ public class Display extends JFrame {
 					pause();
 					break;
 				case 'j':
-					game.tick(1);
+					if (game.updateThread.isPaused())
+						game.tick(1);
 					break;
 				case 'k':
-					game.tick(100);
+					if (game.updateThread.isPaused())
+						game.tick(100);
 					break;
 				case 'l':
-					game.tick(10_000);
+					if (game.updateThread.isPaused())
+						game.tick(10_000);
 					break;
 				case 'c':
 					game.clearMem();
-					break;
-				case 'p':
-					game.thread.interrupt();
-					game.updateThread.setRunning(false);
-					game.renderThread.setRunning(false);
 					break;
 				case 27:
 					System.exit(0);
