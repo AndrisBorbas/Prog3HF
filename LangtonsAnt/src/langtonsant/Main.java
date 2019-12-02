@@ -4,43 +4,24 @@ import java.io.IOException;
 
 import langtonsant.game.Game;
 
+/**
+ * 
+ * @author AndrisBorbas
+ *
+ */
 public class Main {
 
 	/**
 	 * Entry-point of the application.
 	 * 
 	 * @param args command-line arguments
-	 * @throws IOException
+	 * @throws IOException if the application has no permission to save files.
 	 */
 	public static void main(String[] args) throws IOException {
 
 		Game game = new Game("Langtons's Ant", 900, 900, 3, 1, 1, "RLLR");
-		
+
 		game.start();
-		
-		/*
-		Thread gameThread = new Thread(game);
-		gameThread.setName("Game");
-		gameThread.start();
-		*/
-		/*
-		try {
-			Thread.sleep(0);
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		*/
-		/*
-		try {
-			System.out.println("1");
-			game.thread.join();
-			System.out.println("2");
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		 */
 
 		return;
 

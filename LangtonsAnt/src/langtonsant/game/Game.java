@@ -8,7 +8,12 @@ import java.io.IOException;
 import langtonsant.Settings;
 import langtonsant.entity.Ant;
 
-public class Game implements Runnable/* , KeyEventDispatcher */ {
+/**
+ * 
+ * @author AndrisBorbas
+ *
+ */
+public class Game implements Runnable {
 
 	public Display display;
 	public int width, height;
@@ -21,7 +26,7 @@ public class Game implements Runnable/* , KeyEventDispatcher */ {
 
 	protected BufferStrategy bs;
 	protected Graphics g;
-	// private boolean running = false;
+
 	public Thread thread;
 
 	UpdateThread updateThread;
@@ -57,9 +62,10 @@ public class Game implements Runnable/* , KeyEventDispatcher */ {
 		mem = new int[width * height];
 	}
 
-	// Initialization
+	/**
+	 * (Re)Initialize the memory, ant(s) and the graphics with the framebuffer.
+	 */
 	private void init() {
-		// KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
 
 		clearMem();
 
@@ -76,14 +82,18 @@ public class Game implements Runnable/* , KeyEventDispatcher */ {
 
 	}
 
-	// Threaded Start
+	/**
+	 * Threaded start
+	 */
 	public synchronized void start() {
 		thread = new Thread(this);
 		thread.setName("Game" + (runs++));
 		thread.start();
 	}
 
-	// Threaded stop
+	/**
+	 * Threaded stop
+	 */
 	public synchronized void stop() {
 		try {
 			updateThread.join();
@@ -126,13 +136,8 @@ public class Game implements Runnable/* , KeyEventDispatcher */ {
 	 */
 	private void render(String FPSs, String UPSs) throws Exception {
 
-		// setIgnoreRepaint(true);
-
 		g = bs.getDrawGraphics();
-		/*
-		 * g.setColor(Color.GREEN); g.drawString(FPSs, width-60, 20);
-		 * g.setColor(Color.RED); g.drawString(UPSs, width-67, 40);
-		 */
+
 		display.processImage(g, mem);
 
 		g.setColor(Color.GREEN);
@@ -238,9 +243,6 @@ public class Game implements Runnable/* , KeyEventDispatcher */ {
 								("UPS: " + String.format("%.1f", (nowUPS + lastUPS) / 2)));
 					else
 						render(("FPS: " + String.format("%.1f", (nowFPS + lastFPS) / 2)), ("UPS: paused"));
-					/*
-					 * bs.show(); g.dispose();
-					 */
 
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -263,13 +265,15 @@ public class Game implements Runnable/* , KeyEventDispatcher */ {
 		}
 	}
 
-	// Game loop
+	/**
+	 * The main game loop, waits for the render and update threads to exit.
+	 */
 	public void run() {
 
 		init();
 
-		updateThread = new UpdateThread(120L, "UpdateThread");
-		renderThread = new RenderThread(60L, "RenderThread", updateThread);
+		updateThread = new UpdateThread(120L, "UpdateThread" + runs);
+		renderThread = new RenderThread(60L, "RenderThread" + runs, updateThread);
 
 		updateThread.start();
 		renderThread.start();
@@ -285,42 +289,9 @@ public class Game implements Runnable/* , KeyEventDispatcher */ {
 		stop();
 	}
 
-	public String getInstructionset() {
-		return instructionset;
-	}
-
-	public Settings getSettings() {
-		return new Settings(scale, spacing, antmargin);
-	}
-
-	public int getScale() {
-		return scale;
-	}
-
-	public void setScale(int scale) {
-		this.scale = scale;
-	}
-
-	public int getSpacing() {
-		return spacing;
-	}
-
-	public void setSpacing(int spacing) {
-		this.spacing = spacing;
-	}
-
-	public int getAntmargin() {
-		return antmargin;
-	}
-
-	public void setAntmargin(int antmargin) {
-		this.antmargin = antmargin;
-	}
-
-	public void setInstructionset(String instructionset) {
-		this.instructionset = instructionset;
-	}
-
+	/**
+	 * Resets the memory image to black
+	 */
 	public synchronized void clearMem() {
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
@@ -328,5 +299,68 @@ public class Game implements Runnable/* , KeyEventDispatcher */ {
 				mem[x + y * width] = Color.BLACK.getRGB();
 			}
 		}
+	}
+
+	/**
+	 * @return the scale
+	 */
+	public int getScale() {
+		return scale;
+	}
+
+	/**
+	 * @param scale the scale to set
+	 */
+	public void setScale(int scale) {
+		this.scale = scale;
+	}
+
+	/**
+	 * @return the spacing
+	 */
+	public int getSpacing() {
+		return spacing;
+	}
+
+	/**
+	 * @param spacing the spacing to set
+	 */
+	public void setSpacing(int spacing) {
+		this.spacing = spacing;
+	}
+
+	/**
+	 * @return the antmargin
+	 */
+	public int getAntmargin() {
+		return antmargin;
+	}
+
+	/**
+	 * @param antmargin the antmargin to set
+	 */
+	public void setAntmargin(int antmargin) {
+		this.antmargin = antmargin;
+	}
+
+	/**
+	 * @return the instructionset
+	 */
+	public String getInstructionset() {
+		return instructionset;
+	}
+
+	/**
+	 * @param instructionset the instructionset to set
+	 */
+	public void setInstructionset(String instructionset) {
+		this.instructionset = instructionset;
+	}
+
+	/**
+	 * @return the settings
+	 */
+	public Settings getSettings() {
+		return new Settings(scale, spacing, antmargin);
 	}
 }
