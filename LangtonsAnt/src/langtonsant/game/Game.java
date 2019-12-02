@@ -2,15 +2,13 @@ package langtonsant.game;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.KeyEventDispatcher;
-import java.awt.KeyboardFocusManager;
-import java.awt.event.KeyEvent;
 import java.awt.image.BufferStrategy;
 import java.io.IOException;
 
+import langtonsant.Settings;
 import langtonsant.entity.Ant;
 
-public class Game implements Runnable/*, KeyEventDispatcher*/ {
+public class Game implements Runnable/* , KeyEventDispatcher */ {
 
 	private Display display;
 	public int width, height;
@@ -60,7 +58,7 @@ public class Game implements Runnable/*, KeyEventDispatcher*/ {
 
 	// Initialization
 	private void init() {
-		//KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
+		// KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
 
 		clearMem();
 
@@ -79,9 +77,6 @@ public class Game implements Runnable/*, KeyEventDispatcher*/ {
 
 	// Threaded Start
 	public synchronized void start() {
-		/*
-		 * if (running) return; running = true;
-		 */
 		thread = new Thread(this);
 		thread.setName("Game");
 		thread.start();
@@ -89,21 +84,12 @@ public class Game implements Runnable/*, KeyEventDispatcher*/ {
 
 	// Threaded stop
 	public synchronized void stop() {
-		/*
-		 * if (!running) return; running = false;
-		 */
-		
-		
-		
 		try {
-			System.out.println("wat");
 			updateThread.join();
-			
+
 			renderThread.join();
-			System.out.println("rd");
-			//thread.join();
-			//display.dispose();
-			System.out.println("wasd");
+
+			// display.dispose();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -181,7 +167,6 @@ public class Game implements Runnable/*, KeyEventDispatcher*/ {
 		public UpdateThread(long tickRate, String name) {
 			super(tickRate, name);
 			setPaused(true);
-			setRunning(false);
 		}
 
 		public void run() {
@@ -192,7 +177,7 @@ public class Game implements Runnable/*, KeyEventDispatcher*/ {
 
 					try {
 
-						tick(10);
+						tick();
 
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
@@ -221,7 +206,7 @@ public class Game implements Runnable/*, KeyEventDispatcher*/ {
 				}
 
 			}
-			
+
 		}
 	}
 
@@ -300,21 +285,32 @@ public class Game implements Runnable/*, KeyEventDispatcher*/ {
 		updateThread.start();
 		renderThread.start();
 
+		try {
+			Thread.sleep(Long.MAX_VALUE);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+
+		}
+
 		stop();
 	}
 
 	public String getInstructionset() {
 		return instructionset;
 	}
-	/*
-	@Override
-	public boolean dispatchKeyEvent(KeyEvent e) {
-		// System.out.println(e);
-		
-		  if (e.getID() == KeyEvent.KEY_RELEASED) { switch (e.getKeyCode()) { case 32:
-		  display.pause(); } }
-		 
-		return false;
+
+	public Settings getSettings() {
+		return new Settings(scale, spacing, antmargin);
 	}
-	*/
+
+	/*
+	 * @Override public boolean dispatchKeyEvent(KeyEvent e) { //
+	 * System.out.println(e);
+	 * 
+	 * if (e.getID() == KeyEvent.KEY_RELEASED) { switch (e.getKeyCode()) { case 32:
+	 * display.pause(); } }
+	 * 
+	 * return false; }
+	 */
 }

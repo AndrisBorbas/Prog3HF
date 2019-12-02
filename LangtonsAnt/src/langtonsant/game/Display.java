@@ -28,6 +28,10 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 public class Display extends JFrame {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Canvas canvas;
 	protected JMenuBar menuBar;
 	private Game game;
@@ -97,24 +101,23 @@ public class Display extends JFrame {
 					game.clearMem();
 					break;
 				case 'p':
-					//game.updateThread.setRunning(false);
+					game.thread.interrupt();
+					game.updateThread.setRunning(false);
 					game.renderThread.setRunning(false);
 					break;
 				}
 			}
 
-			@Override
 			public void keyPressed(KeyEvent e) {
-				// TODO Auto-generated method stub
-
 			}
 
-			@Override
 			public void keyReleased(KeyEvent e) {
-				// TODO Auto-generated method stub
-
 			}
 		});
+
+		// also add KeyListener to canvas:
+		// https://stackoverflow.com/questions/286727/unresponsive-keylistener-for-jframe
+		canvas.addKeyListener(this.getKeyListeners()[0]);
 
 		crateMenuBar();
 
@@ -138,8 +141,17 @@ public class Display extends JFrame {
 
 	private void crateMenuBar() {
 		JMenu fileMenu = new JMenu("File");
+		JMenuItem fileMenuNew = new JMenuItem("New");
 		JMenuItem fileMenuExport = new JMenuItem("Export");
 		JMenuItem fileMenuExit = new JMenuItem("Exit");
+		fileMenuNew.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Setup temp = new Setup("New simulation", game);
+			}
+
+		});
 		fileMenuExport.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JFrame temp = new JFrame();
@@ -164,6 +176,7 @@ public class Display extends JFrame {
 				System.exit(0);
 			}
 		});
+		fileMenu.add(fileMenuNew);
 		fileMenu.add(fileMenuExport);
 		fileMenu.add(fileMenuExit);
 		menuBar.add(fileMenu);
@@ -232,8 +245,6 @@ public class Display extends JFrame {
 		g.drawImage(img, 0, 0, width, height, null);
 	}
 
-	// public void paint (Graphics g) {}
-
 	public synchronized void exportImage(File file) {
 		try {
 			ImageIO.write(toBufferedImage(
@@ -245,6 +256,10 @@ public class Display extends JFrame {
 		}
 	}
 
+	/**
+	 * convert to BufferedImage for export
+	 * https://stackoverflow.com/questions/13605248/java-converting-image-to-bufferedimage
+	 */
 	public static BufferedImage toBufferedImage(Image img) {
 		if (img instanceof BufferedImage) {
 			return (BufferedImage) img;
