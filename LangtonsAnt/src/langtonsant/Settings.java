@@ -3,12 +3,12 @@ package langtonsant;
 import java.io.Serializable;
 
 public class Settings implements Serializable, Comparable<Settings> {
-	
+
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -3161023995311445340L;
-	
+	private static final long serialVersionUID = 1950403861603766221L;
+
 	private int id;
 	private int scale, spacing, antmargin;
 
@@ -19,8 +19,8 @@ public class Settings implements Serializable, Comparable<Settings> {
 		this.id = (scale * 100) + (spacing * 10) + antmargin;
 	}
 
-	public Settings(){
-		
+	public Settings() {
+
 	}
 
 	public int getID() {

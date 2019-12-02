@@ -66,7 +66,6 @@ public class Display extends JFrame {
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setResizable(false);
 		this.setLocationRelativeTo(null);
-		this.setVisible(true);
 		this.setAlwaysOnTop(false);
 
 		canvas = new Canvas();
@@ -125,6 +124,7 @@ public class Display extends JFrame {
 
 		this.add(canvas, BorderLayout.CENTER);
 		this.pack();
+		this.setVisible(true);
 	}
 
 	public boolean pause() {
@@ -158,7 +158,7 @@ public class Display extends JFrame {
 				JFileChooser chooser = new JFileChooser(System.getProperty("user.dir"));
 				chooser.setDialogType(JFileChooser.SAVE_DIALOG);
 				chooser.setDialogTitle("Specify a file to save");
-				chooser.setSelectedFile(new File("export.png"));
+				chooser.setSelectedFile(new File(game.thread.getName() + ".png"));
 
 				int returnVal = chooser.showSaveDialog(temp);
 				if (returnVal == JFileChooser.APPROVE_OPTION) {

@@ -10,11 +10,12 @@ import langtonsant.entity.Ant;
 
 public class Game implements Runnable/* , KeyEventDispatcher */ {
 
-	private Display display;
+	public Display display;
 	public int width, height;
 	public String title;
 
 	int steps = 0;
+	static int runs = 0;
 
 	public static int saves = 0;
 
@@ -78,7 +79,7 @@ public class Game implements Runnable/* , KeyEventDispatcher */ {
 	// Threaded Start
 	public synchronized void start() {
 		thread = new Thread(this);
-		thread.setName("Game");
+		thread.setName("Game" + (runs++));
 		thread.start();
 	}
 
@@ -89,19 +90,10 @@ public class Game implements Runnable/* , KeyEventDispatcher */ {
 
 			renderThread.join();
 
-			// display.dispose();
+			display.dispose();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-	}
-
-	public synchronized void clearMem() {
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				// Color pixel at x,y
-				mem[x + y * width] = Color.BLACK.getRGB();
-			}
 		}
 	}
 
@@ -204,9 +196,7 @@ public class Game implements Runnable/* , KeyEventDispatcher */ {
 						e.printStackTrace();
 					}
 				}
-
 			}
-
 		}
 	}
 
@@ -270,7 +260,6 @@ public class Game implements Runnable/* , KeyEventDispatcher */ {
 				ticks++;
 
 			}
-			System.out.println("stop");
 		}
 	}
 
@@ -304,13 +293,40 @@ public class Game implements Runnable/* , KeyEventDispatcher */ {
 		return new Settings(scale, spacing, antmargin);
 	}
 
-	/*
-	 * @Override public boolean dispatchKeyEvent(KeyEvent e) { //
-	 * System.out.println(e);
-	 * 
-	 * if (e.getID() == KeyEvent.KEY_RELEASED) { switch (e.getKeyCode()) { case 32:
-	 * display.pause(); } }
-	 * 
-	 * return false; }
-	 */
+	public int getScale() {
+		return scale;
+	}
+
+	public void setScale(int scale) {
+		this.scale = scale;
+	}
+
+	public int getSpacing() {
+		return spacing;
+	}
+
+	public void setSpacing(int spacing) {
+		this.spacing = spacing;
+	}
+
+	public int getAntmargin() {
+		return antmargin;
+	}
+
+	public void setAntmargin(int antmargin) {
+		this.antmargin = antmargin;
+	}
+
+	public void setInstructionset(String instructionset) {
+		this.instructionset = instructionset;
+	}
+
+	public synchronized void clearMem() {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				// Color pixel at x,y
+				mem[x + y * width] = Color.BLACK.getRGB();
+			}
+		}
+	}
 }

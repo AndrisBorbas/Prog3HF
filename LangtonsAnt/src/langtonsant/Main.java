@@ -14,7 +14,7 @@ public class Main {
 	 */
 	public static void main(String[] args) throws IOException {
 
-		Game game = new Game("Langtons's Ant", 900, 900, 3, 1, 1, "RRLLLRLLLRRR");
+		Game game = new Game("Langtons's Ant", 900, 900, 3, 1, 1, "RLLR");
 		
 		game.start();
 		
@@ -31,7 +31,7 @@ public class Main {
 			e1.printStackTrace();
 		}
 		*/
-
+		/*
 		try {
 			System.out.println("1");
 			game.thread.join();
@@ -40,8 +40,7 @@ public class Main {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		System.out.println("wa");
+		 */
 
 		return;
 

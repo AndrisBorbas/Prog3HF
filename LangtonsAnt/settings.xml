@@ -31,4 +31,12 @@
    </object>
   </void>
  </object>
+ <object class="java.util.TreeSet">
+  <void method="add">
+   <string>RLLR</string>
+  </void>
+  <void method="add">
+   <string>RRLLLRLLLRRR</string>
+  </void>
+ </object>
 </java>
