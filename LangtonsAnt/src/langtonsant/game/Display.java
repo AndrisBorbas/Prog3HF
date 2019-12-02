@@ -262,7 +262,8 @@ public class Display extends JFrame {
 		JMenuItem helpMenuAbout = new JMenuItem("About");
 		helpMenuAbout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(helpMenu.getParent(), "Langton's Ant \n© Andris Borbás 2019", "About",
+				JOptionPane.showMessageDialog(helpMenu.getParent(),
+						"Langton's Ant \n© Andris Borbás 2019\nhttp://github.andrisborbas.com/Prog3HF", "About",
 						JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
