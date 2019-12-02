@@ -1,0 +1,28 @@
+#HTMLDOC 1.9.7
+-t pdf13 -f "doc.pdf" --webpage --no-title --linkstyle underline --size Universal --left 1.00in --right 0.50in --top 0.50in --bottom 0.50in --header .t. --header1 ... --footer h.1 --nup 1 --tocheader .t. --tocfooter ..i --portrait --color --no-pscommands --no-xrxcomments --compression=1 --jpeg=0 --fontsize 11.0 --fontspacing 1.2 --headingfont Helvetica --bodyfont Times --headfootsize 11.0 --headfootfont Helvetica --charset iso-8859-1 --links --embedfonts --pagemode document --pagelayout single --firstpage p1 --pageeffect none --pageduration 10 --effectduration 1.0 --no-encryption --permissions all  --owner-password ""  --user-password "" --browserwidth 680 --no-strict --no-overflow
+doc/allclasses-frame.html
+doc/allclasses-noframe.html
+doc/constant-values.html
+doc/deprecated-list.html
+doc/help-doc.html
+doc/index.html
+doc/overview-frame.html
+doc/overview-summary.html
+doc/overview-tree.html
+doc/serialized-form.html
+doc/langtonsant/Main.html
+doc/langtonsant/Settings.html
+doc/langtonsant/package-frame.html
+doc/langtonsant/package-summary.html
+doc/langtonsant/package-tree.html
+doc/langtonsant/package-use.html
+doc/langtonsant/game/Display.html
+doc/langtonsant/game/Game.RenderThread.html
+doc/langtonsant/game/Game.UpdateThread.html
+doc/langtonsant/game/Game.html
+doc/langtonsant/game/Setup.html
+doc/langtonsant/game/TickThread.html
+doc/langtonsant/game/package-frame.html
+doc/langtonsant/game/package-summary.html
+doc/langtonsant/game/package-tree.html
+doc/langtonsant/game/package-use.html

@@ -1,5 +1,11 @@
 package langtonsant.entity;
 
+/**
+ * Stores where the ant is facing
+ * 
+ * @author AndrisBorbas
+ *
+ */
 public class Heading {
 
 	public int heading;
@@ -13,14 +19,23 @@ public class Heading {
 	}
 
 	public void convert(String h) {
-		if (h.compareToIgnoreCase("UP") == 0)
+		if (h.compareToIgnoreCase("UP") == 0) {
 			heading = 0;
-		if (h.compareToIgnoreCase("RIGHT") == 0)
+			return;
+		}
+		if (h.compareToIgnoreCase("RIGHT") == 0) {
 			heading = 90;
-		if (h.compareToIgnoreCase("DOWN") == 0)
+			return;
+		}
+		if (h.compareToIgnoreCase("DOWN") == 0) {
 			heading = 180;
-		if (h.compareToIgnoreCase("LEFT") == 0)
+			return;
+		}
+		if (h.compareToIgnoreCase("LEFT") == 0) {
 			heading = 270;
+			return;
+		}
+		throw new RuntimeException(toString() + "Direction corrupted");
 	}
 
 	public void set(String h) {

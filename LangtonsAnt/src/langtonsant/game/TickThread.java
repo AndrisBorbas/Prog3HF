@@ -7,13 +7,19 @@ public abstract class TickThread extends Thread {
 
 	protected boolean running = true, paused = false;
 
-	// Update rate timer
+	/**
+	 * Update rate timer
+	 */
 	protected long timePerTick;
 
-	// Time handling
+	/**
+	 * Time handling
+	 */
 	protected long now, before, timeTilNextFrame = 0L, millisTilNextFrame = 0L, lapse = 0L;
 
-	// framerate and update rate counters
+	/**
+	 * framerate and update rate counters
+	 */
 	protected int ticks = 0, nanosTilNextFrame = 0;
 
 	/**
@@ -57,18 +63,30 @@ public abstract class TickThread extends Thread {
 		now = System.nanoTime();
 	}
 
+	/**
+	 * @return the running
+	 */
 	public boolean isRunning() {
 		return running;
 	}
 
+	/**
+	 * @param running the running to set
+	 */
 	public void setRunning(boolean running) {
 		this.running = running;
 	}
 
+	/**
+	 * @return the paused
+	 */
 	public boolean isPaused() {
 		return paused;
 	}
 
+	/**
+	 * @param paused the paused to set
+	 */
 	public void setPaused(boolean paused) {
 		this.paused = paused;
 	}

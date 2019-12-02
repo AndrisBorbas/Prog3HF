@@ -2,14 +2,25 @@ package langtonsant;
 
 import java.io.Serializable;
 
+/**
+ * Stores the settings of the ant
+ * 
+ * @author AndrisBorbas
+ *
+ */
 public class Settings implements Serializable, Comparable<Settings> {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1950403861603766221L;
-
+	/**
+	 * The generated id
+	 */
 	private int id;
+	/**
+	 * The settings to store
+	 */
 	private int scale, spacing, antmargin;
 
 	public Settings(int scale, int spacing, int antmargin) {
@@ -21,10 +32,6 @@ public class Settings implements Serializable, Comparable<Settings> {
 
 	public Settings() {
 
-	}
-
-	public int getID() {
-		return id;
 	}
 
 	@Override
@@ -68,34 +75,58 @@ public class Settings implements Serializable, Comparable<Settings> {
 		}
 	}
 
-	public int getId() {
+	/**
+	 * @return the id
+	 */
+	public int getID() {
 		return id;
 	}
 
-	public void setId(int id) {
+	/**
+	 * @param id the id to set
+	 */
+	public void setID(int id) {
 		this.id = id;
 	}
 
+	/**
+	 * @return the scale
+	 */
 	public int getScale() {
 		return scale;
 	}
 
+	/**
+	 * @param scale the scale to set
+	 */
 	public void setScale(int scale) {
 		this.scale = scale;
 	}
 
+	/**
+	 * @return the spacing
+	 */
 	public int getSpacing() {
 		return spacing;
 	}
 
+	/**
+	 * @param spacing the spacing to set
+	 */
 	public void setSpacing(int spacing) {
 		this.spacing = spacing;
 	}
 
+	/**
+	 * @return the antmargin
+	 */
 	public int getAntmargin() {
 		return antmargin;
 	}
 
+	/**
+	 * @param antmargin the antmargin to set
+	 */
 	public void setAntmargin(int antmargin) {
 		this.antmargin = antmargin;
 	}

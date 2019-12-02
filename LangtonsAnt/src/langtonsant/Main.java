@@ -12,6 +12,11 @@ import langtonsant.game.Game;
 public class Main {
 
 	/**
+	 * Whether to get the Systems UI.
+	 */
+	public static boolean isDarkMode = false;
+
+	/**
 	 * Entry-point of the application.
 	 * 
 	 * @param args command-line arguments
@@ -19,7 +24,7 @@ public class Main {
 	 */
 	public static void main(String[] args) throws IOException {
 
-		Game game = new Game("Langtons's Ant", 900, 900, 3, 1, 1, "RLLR");
+		Game game = new Game("Langtons's Ant", 900, 900, 1, 0, 1, "RL", false);
 
 		game.start();
 

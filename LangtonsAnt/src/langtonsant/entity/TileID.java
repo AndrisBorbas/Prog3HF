@@ -1,5 +1,10 @@
 package langtonsant.entity;
 
+/**
+ * Handles updating the tiles inside the ants "brain"
+ * @author AndrisBorbas
+ *
+ */
 public class TileID {
 	private int currentID, lastID, max;
 

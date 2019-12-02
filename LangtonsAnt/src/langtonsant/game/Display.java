@@ -26,22 +26,51 @@ import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import langtonsant.Main;
+
+/**
+ * The main window where the simulation is shown
+ * 
+ * @author AndrisBorbas
+ *
+ */
 public class Display extends JFrame {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	/**
+	 * The canvas where the image made by the ants is draw to
+	 */
 	private Canvas canvas;
+	/**
+	 * The top menu bar for interaction with a mouse
+	 */
 	protected JMenuBar menuBar;
+	/**
+	 * Reference to the game
+	 */
 	private Game game;
 
+	/**
+	 * Reference to the memory image
+	 */
 	private int[] mem;
 
+	/**
+	 * The size of the window
+	 */
 	private int width, height;
 
+	/**
+	 * Reference to the pause button for setting its text
+	 */
 	public JMenuItem editMenuPause;
 
+	/**
+	 * The default and only constructor
+	 */
 	public Display(String title, Game game, int width, int height, int[] mem) {
 		super(title);
 		this.width = width;
@@ -53,15 +82,19 @@ public class Display extends JFrame {
 
 	}
 
+	/**
+	 * Creates the JFrame and fills it with stuff
+	 */
 	private void createFrame() {
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
-				| UnsupportedLookAndFeelException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if (Main.isDarkMode) {
+			try {
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+					| UnsupportedLookAndFeelException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-
 		this.setSize(width, height);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setResizable(false);
@@ -79,11 +112,20 @@ public class Display extends JFrame {
 
 		menuBar = new JMenuBar();
 
+		crateMenuBar();
+
 		this.addKeyListener(new KeyListener() {
 
 			@Override
 			public void keyTyped(KeyEvent e) {
 				switch (e.getKeyChar()) {
+				case 'n':
+					game.updateThread.setPaused(true);
+					new Setup("New simulation", game);
+					break;
+				case 'e':
+					createTempExportFrame();
+					break;
 				case ' ':
 					pause();
 					break;
@@ -104,6 +146,8 @@ public class Display extends JFrame {
 					game.updateThread.setRunning(false);
 					game.renderThread.setRunning(false);
 					break;
+				case 27:
+					System.exit(0);
 				}
 			}
 
@@ -114,11 +158,10 @@ public class Display extends JFrame {
 			}
 		});
 
-		// also add KeyListener to canvas:
+		// also add KeyListener to canvas and menubar:
 		// https://stackoverflow.com/questions/286727/unresponsive-keylistener-for-jframe
 		canvas.addKeyListener(this.getKeyListeners()[0]);
-
-		crateMenuBar();
+		menuBar.addKeyListener(this.getKeyListeners()[0]);
 
 		this.setJMenuBar(menuBar);
 
@@ -127,6 +170,11 @@ public class Display extends JFrame {
 		this.setVisible(true);
 	}
 
+	/**
+	 * Sets the Pausebuttons text and pauses the updating
+	 * 
+	 * @return the inverse of the state of the game
+	 */
 	public boolean pause() {
 		if (game.updateThread.isPaused()) {
 			game.updateThread.setPaused(false);
@@ -139,36 +187,26 @@ public class Display extends JFrame {
 		}
 	}
 
+	/**
+	 * Creates the top menubar and fills it with stuff
+	 */
 	private void crateMenuBar() {
 		JMenu fileMenu = new JMenu("File");
-		JMenuItem fileMenuNew = new JMenuItem("New");
-		JMenuItem fileMenuExport = new JMenuItem("Export");
-		JMenuItem fileMenuExit = new JMenuItem("Exit");
+		JMenuItem fileMenuNew = new JMenuItem("New (N)");
+		JMenuItem fileMenuExport = new JMenuItem("Export (E)");
+		JMenuItem fileMenuExit = new JMenuItem("Exit (Esc)");
 		fileMenuNew.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Setup temp = new Setup("New simulation", game);
+				game.updateThread.setPaused(true);
+				new Setup("New simulation", game);
 			}
 
 		});
 		fileMenuExport.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JFrame temp = new JFrame();
-				JFileChooser chooser = new JFileChooser(System.getProperty("user.dir"));
-				chooser.setDialogType(JFileChooser.SAVE_DIALOG);
-				chooser.setDialogTitle("Specify a file to save");
-				chooser.setSelectedFile(new File(game.thread.getName() + ".png"));
-
-				int returnVal = chooser.showSaveDialog(temp);
-				if (returnVal == JFileChooser.APPROVE_OPTION) {
-					File f = chooser.getSelectedFile();
-					if (!(f.getName().contains(".png"))) {
-						f = new File(f.getName() + ".png");
-					}
-					System.out.println("You chose to save to: " + f.getName());
-					exportImage(f);
-				}
+				createTempExportFrame();
 			}
 		});
 		fileMenuExit.addActionListener(new ActionListener() {
@@ -182,11 +220,11 @@ public class Display extends JFrame {
 		menuBar.add(fileMenu);
 
 		JMenu editMenu = new JMenu("Edit");
-		editMenuPause = new JMenuItem("Start (space)");
-		JMenuItem editMenuStep1 = new JMenuItem("Step 1 (j)");
-		JMenuItem editMenuStep2 = new JMenuItem("Step 100 (k)");
-		JMenuItem editMenuStep3 = new JMenuItem("Step 10000 (l)");
-		JMenuItem editMenuClear = new JMenuItem("Clear Screen (c)");
+		editMenuPause = new JMenuItem("Start (Space)");
+		JMenuItem editMenuStep1 = new JMenuItem("Step 1 (J)");
+		JMenuItem editMenuStep2 = new JMenuItem("Step 100 (K)");
+		JMenuItem editMenuStep3 = new JMenuItem("Step 10000 (L)");
+		JMenuItem editMenuClear = new JMenuItem("Clear Screen (C)");
 		editMenuPause.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				pause();
@@ -235,16 +273,31 @@ public class Display extends JFrame {
 
 	}
 
+	/**
+	 * 
+	 * @return the canvas
+	 */
 	public Canvas getCanvas() {
 		return canvas;
 	}
 
+	/**
+	 * Converts the image to be displayed on the screen
+	 * 
+	 * @param g   the graphics class
+	 * @param mem the memory image
+	 */
 	public void processImage(Graphics g, int[] mem) {
 		setIgnoreRepaint(true);
 		Image img = canvas.createImage(new MemoryImageSource(width, height, this.mem, 0, width));
 		g.drawImage(img, 0, 0, width, height, null);
 	}
 
+	/**
+	 * Exports the current state of the simulation to a png
+	 * 
+	 * @param file the file to export the image to
+	 */
 	public synchronized void exportImage(File file) {
 		try {
 			ImageIO.write(toBufferedImage(
@@ -257,8 +310,30 @@ public class Display extends JFrame {
 	}
 
 	/**
-	 * convert to BufferedImage for export
-	 * https://stackoverflow.com/questions/13605248/java-converting-image-to-bufferedimage
+	 * Creates the file chooser window and gets the file
+	 */
+	public void createTempExportFrame() {
+		JFrame temp = new JFrame();
+		JFileChooser chooser = new JFileChooser(System.getProperty("user.dir"));
+		chooser.setDialogType(JFileChooser.SAVE_DIALOG);
+		chooser.setDialogTitle("Specify a file to save");
+		chooser.setSelectedFile(new File(game.thread.getName() + ".png"));
+
+		int returnVal = chooser.showSaveDialog(temp);
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			File f = chooser.getSelectedFile();
+			if (!(f.getName().contains(".png"))) {
+				f = new File(f.getName() + ".png");
+			}
+			System.out.println("You chose to save to: " + f.getName());
+			exportImage(f);
+		}
+	}
+
+	/**
+	 * Converts to BufferedImage for export <a href=
+	 * "https://stackoverflow.com/questions/13605248/java-converting-image-to-bufferedimage">
+	 * https://stackoverflow.com/questions/13605248/java-converting-image-to-bufferedimage</a>
 	 */
 	public static BufferedImage toBufferedImage(Image img) {
 		if (img instanceof BufferedImage) {
