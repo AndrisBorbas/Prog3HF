@@ -6,6 +6,7 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.ExceptionListener;
+import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -42,7 +43,7 @@ public class Setup extends JFrame {
 		loadSettings();
 
 		addConfig(game.getSettings());
-		
+
 		saveSettings();
 
 		createFrame();
@@ -99,7 +100,7 @@ public class Setup extends JFrame {
 		c.gridy = 1;
 		c.gridx = 2;
 		this.add(antmarginSpinner, c);
-		
+
 		this.setResizable(false);
 		this.setLocationByPlatform(true);
 		this.pack();
@@ -117,9 +118,13 @@ public class Setup extends JFrame {
 
 	private void loadSettings() {
 		try {
-			ObjectInputStream ois = new ObjectInputStream(new FileInputStream("settings.dat"));
-			settings = (HashSet<Settings>) ois.readObject();
-			ois.close();
+			FileInputStream fis = new FileInputStream("settings.xml");
+			XMLDecoder decoder = new XMLDecoder(fis);
+
+			settings = (HashSet<Settings>) decoder.readObject();
+
+			decoder.close();
+			fis.close();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -127,33 +132,25 @@ public class Setup extends JFrame {
 		for (Settings s : settings) {
 			System.out.println(s);
 		}
-		System.out.println("in");
 
 	}
 
 	private void saveSettings() {
 		try {
-			//ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("settings.dat"));
 			FileOutputStream fos = new FileOutputStream("settings.xml");
 			XMLEncoder encoder = new XMLEncoder(fos);
-			
+
 			encoder.setExceptionListener(new ExceptionListener() {
-	            public void exceptionThrown(Exception e) {
-	                System.out.println("Exception!: " + e.toString());
-	            }
-	        });
-			
+				public void exceptionThrown(Exception e) {
+					System.out.println("Exception!: " + e.toString());
+				}
+			});
+
 			encoder.writeObject(settings);
-			/*
-			for (Settings s : settings) {
-				encoder.writeObject(s);
-			}
-			*/
-			//oos.writeObject(settings);
-			System.out.println("xml");
+
 			encoder.close();
 			fos.close();
-			//oos.close();
+
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

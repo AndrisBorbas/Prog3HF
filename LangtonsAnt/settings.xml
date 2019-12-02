@@ -2,16 +2,33 @@
 <java version="1.8.0_222" class="java.beans.XMLDecoder">
  <object class="java.util.HashSet">
   <void method="add">
-   <object class="langtonsant.Settings"/>
+   <object class="langtonsant.Settings">
+    <void property="antmargin">
+     <int>2</int>
+    </void>
+    <void property="id">
+     <int>402</int>
+    </void>
+    <void property="scale">
+     <int>4</int>
+    </void>
+   </object>
   </void>
   <void method="add">
-   <object class="langtonsant.Settings"/>
-  </void>
-  <void method="add">
-   <object class="langtonsant.Settings"/>
-  </void>
-  <void method="add">
-   <object class="langtonsant.Settings"/>
+   <object class="langtonsant.Settings">
+    <void property="antmargin">
+     <int>1</int>
+    </void>
+    <void property="id">
+     <int>311</int>
+    </void>
+    <void property="scale">
+     <int>3</int>
+    </void>
+    <void property="spacing">
+     <int>1</int>
+    </void>
+   </object>
   </void>
  </object>
 </java>

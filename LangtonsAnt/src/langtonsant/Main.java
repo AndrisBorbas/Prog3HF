@@ -14,7 +14,7 @@ public class Main {
 	 */
 	public static void main(String[] args) throws IOException {
 
-		Game game = new Game("Langtons's Ant", 900, 900, 4, 0, 2, "RRLLLRLLLRRR");
+		Game game = new Game("Langtons's Ant", 900, 900, 3, 1, 1, "RRLLLRLLLRRR");
 		
 		game.start();
 		

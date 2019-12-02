@@ -68,4 +68,36 @@ public class Settings implements Serializable, Comparable<Settings> {
 		}
 	}
 
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public int getScale() {
+		return scale;
+	}
+
+	public void setScale(int scale) {
+		this.scale = scale;
+	}
+
+	public int getSpacing() {
+		return spacing;
+	}
+
+	public void setSpacing(int spacing) {
+		this.spacing = spacing;
+	}
+
+	public int getAntmargin() {
+		return antmargin;
+	}
+
+	public void setAntmargin(int antmargin) {
+		this.antmargin = antmargin;
+	}
+
 }
