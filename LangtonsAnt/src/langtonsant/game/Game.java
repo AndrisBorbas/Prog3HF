@@ -237,7 +237,7 @@ public class Game implements Runnable {
 	 */
 	public class UpdateThread extends TickThread {
 
-		public int stepper = 1;
+		// public int stepper = 1;
 
 		/**
 		 * UpdateThread constructor.
@@ -258,8 +258,8 @@ public class Game implements Runnable {
 
 					try {
 
-						tick(stepper);
-						stepper = 1;
+						tick(/* stepper */);
+						// stepper = 1;
 
 					} catch (Exception e) {
 						// TODO Auto-generated catch block

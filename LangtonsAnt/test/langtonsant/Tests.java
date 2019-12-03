@@ -18,10 +18,13 @@ import langtonsant.entity.Heading;
 import langtonsant.game.Game;
 
 /**
- * @author A
+ * @author AndrisBorbas
  *
  */
 public class Tests {
+	
+	Game g;
+	Robot robot;
 
 	/**
 	 * @throws java.lang.Exception
@@ -35,13 +38,14 @@ public class Tests {
 	 */
 	@Before
 	public void setUp() throws Exception {
+		g = new Game("Langtons's Ant", 900, 900, 1, 0, 1, "RL", false);
+		g.start();
+		robot = new Robot();
+		robot.delay(3000);
 	}
 
 	@Test
 	public void GameBasicTest() throws IOException, InterruptedException {
-		Game g = new Game("Langtons's Ant", 900, 900, 1, 0, 1, "RL", false);
-		g.start();
-		Thread.sleep(1000);
 		Assert.assertEquals(new Settings(1, 0, 1), g.getSettings());
 		Assert.assertEquals(true, g.updateThread.isPaused());
 		Assert.assertEquals(true, g.updateThread.isRunning());
@@ -50,10 +54,6 @@ public class Tests {
 
 	@Test
 	public void NewGameTest() throws IOException, AWTException {
-		Game g = new Game("Langtons's Ant", 900, 900, 1, 0, 1, "RRLL", false);
-		g.start();
-		Robot robot = new Robot();
-		robot.delay(1000);
 		robot.keyPress(KeyEvent.VK_SPACE);
 		robot.keyRelease(KeyEvent.VK_SPACE);
 		robot.delay(1000);
@@ -89,10 +89,6 @@ public class Tests {
 
 	@Test
 	public void OOBTest() throws Exception {
-		Game g = new Game("Langtons's Ant", 900, 900, 1, 0, 1, "RL", false);
-		g.start();
-		Robot robot = new Robot();
-		robot.delay(1000);
 		robot.keyPress(KeyEvent.VK_L);
 		robot.keyRelease(KeyEvent.VK_L);
 		robot.delay(100);
@@ -114,10 +110,6 @@ public class Tests {
 
 	@Test
 	public void ExportTest() throws IOException, AWTException {
-		Game g = new Game("Langtons's Ant", 900, 900, 1, 0, 1, "RRLL", false);
-		g.start();
-		Robot robot = new Robot();
-		robot.delay(2500);
 		robot.keyPress(KeyEvent.VK_SPACE);
 		robot.keyRelease(KeyEvent.VK_SPACE);
 		robot.delay(1000);

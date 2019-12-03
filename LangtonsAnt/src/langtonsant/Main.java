@@ -24,7 +24,16 @@ public class Main {
 	 */
 	public static void main(String[] args) throws IOException {
 
-		Game game = new Game("Langtons's Ant", 900, 900, 1, 0, 1, "RL", false);
+		int res = 900;
+
+		if (args.length != 0) {
+			int temp = Integer.parseInt(args[0]);
+			if (temp >= 400 && temp <= 2100) {
+				res = temp;
+			}
+		}
+
+		Game game = new Game("Langtons's Ant", res, res, 1, 0, 1, "RL", false);
 
 		game.start();
 
